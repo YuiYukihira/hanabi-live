@@ -479,30 +479,17 @@ func httpLoginValidate(c *gin.Context) (*HTTPLoginData, bool) {
 	// We want to explicitly disallow clients who are running old versions of the code
 	// But make an exception for bots, who can just use the string of "bot"
 	if version != "bot" {
-		var versionNum int
-		if v, err := strconv.Atoi(version); err != nil {
-			logger.Info("User from IP \"" + ip + "\" tried to log in with a username of " +
-				"\"" + username + "\", but the submitted version is not an integer.")
-			http.Error(
-				w,
-				"The submitted version must be an integer.",
-				http.StatusUnauthorized,
-			)
-			return nil, false
-		} else {
-			versionNum = v
-		}
 		currentVersion := getVersion()
-		if versionNum != currentVersion {
+		if version != currentVersion {
 			logger.Info("User from IP \"" + ip + "\" tried to log in with a username of " +
 				"\"" + username + "\" and a version of \"" + version + "\", " +
 				"but this is an old version. " +
-				"(The current version is " + strconv.Itoa(currentVersion) + ".)")
+				"(The current version is " + currentVersion + ".)")
 			http.Error(
 				w,
 				"You are running an outdated version of the client code.<br />"+
 					"(You are on <strong>v"+version+"</strong> and "+
-					"the latest is <strong>v"+strconv.Itoa(currentVersion)+"</strong>.)<br />"+
+					"the latest is <strong>v"+currentVersion+"</strong>.)<br />"+
 					"Please perform a "+
 					"<a href=\"https://www.getfilecloud.com/blog/2015/03/tech-tip-how-to-do-hard-refresh-in-browsers/\">"+
 					"hard-refresh</a> to get the latest version.<br />"+

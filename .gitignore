@@ -7,7 +7,7 @@
 thumbs.db
 
 # The compiled Golang binary
-hanabi-live
+/hanabi-live
 hanabi-live~
 hanabi-live.exe
 hanabi-live-temp
@@ -190,3 +190,6 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# nix
+result*

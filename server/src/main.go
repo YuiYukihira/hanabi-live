@@ -4,7 +4,6 @@ package main // In Go, executable commands must always use package main
 
 import (
 	"os"
-	"os/exec"
 	"path"
 	"path/filepath"
 	"strings"
@@ -23,6 +22,8 @@ var (
 	jsonPath    string
 	versionPath string
 	tablesPath  string
+	dataPath    string
+	clientPath  string
 
 	gitCommitOnStart string
 	isDev            bool
@@ -51,22 +52,14 @@ func main() {
 		projectPath = filepath.Dir(v)
 	}
 
-	// Check to see if the ".env" file exists
-	envPath := path.Join(projectPath, ".env")
-	if _, err := os.Stat(envPath); os.IsNotExist(err) {
-		logger.Fatal("The \"" + envPath + "\" file does not exist. " +
-			"Did you run the \"install_dependencies.sh\" script before running the server? " +
-			"This file should automatically be created when running this script.")
-		return
-	} else if err != nil {
-		logger.Fatal("Failed to check if the \"" + envPath + "\" file exists: " + err.Error())
+	// Load the ".env" file which contains environment variables with secret values
+	if err := godotenv.Load(); err != nil && !os.IsNotExist(err) {
+		logger.Fatal("Failed to load the \".env\" file: " + err.Error())
 		return
 	}
 
-	// Load the ".env" file which contains environment variables with secret values
-	if err := godotenv.Load(envPath); err != nil {
-		logger.Fatal("Failed to load the \".env\" file: " + err.Error())
-		return
+	if os.Getenv("DATADIR") == "" {
+		dataPath = projectPath
 	}
 
 	// Initialize dev environment
@@ -95,17 +88,21 @@ func main() {
 	// Record the commit that corresponds with when the Golang code was compiled
 	// (this is useful to know what version of the server is running,
 	// since it is possible to update the client without restarting the server)
-	cmd := exec.Command("git", "rev-parse", "HEAD")
-	if stdout, err := cmd.Output(); err != nil {
-		logger.Fatal("Failed to perform a \"git rev-parse HEAD\": " + err.Error())
+	version := os.Getenv("VERSION")
+	if version == "" {
+		logger.Fatal("No version specified")
 		return
-	} else {
-		gitCommitOnStart = strings.TrimSpace(string(stdout))
 	}
-	logger.Info("Current git commit: " + gitCommitOnStart)
+	logger.Info("version: " + version)
 
+
+	clientPath = os.Getenv("CLIENT_DIST")
+	if clientPath == "" {
+		logger.Warn("No CLIENT_DIST provided, assuming ./")
+		clientPath = "./"
+	}
 	// Check to see if the data path exists
-	jsonPath = path.Join(projectPath, "packages", "game", "src", "json")
+	jsonPath = path.Join(clientPath, "packages", "game", "src", "json")
 	if _, err := os.Stat(jsonPath); os.IsNotExist(err) {
 		logger.Fatal("The path of \"" + jsonPath + "\" does not exist. " +
 			"This directory should always exist; please try re-cloning the repository.")
@@ -117,7 +114,7 @@ func main() {
 
 	// Check to see if the version file exists
 	// (which informs us about what the version the client is currently compiled at)
-	versionPath = path.Join(projectPath, "public", "js", "bundles", "version.txt")
+	versionPath = path.Join(clientPath, "public", "js", "bundles", "version.txt")
 	if _, err := os.Stat(versionPath); os.IsNotExist(err) {
 		logger.Fatal("The \"" + versionPath + "\" file does not exist. " +
 			"Did you run the \"install_dependencies.sh\" script before running the server? " +
@@ -129,7 +126,7 @@ func main() {
 	}
 
 	// Check to see if the "ongoing_tables" directory exists
-	tablesPath = path.Join(projectPath, "ongoing_tables")
+	tablesPath = path.Join(".", "ongoing_tables")
 	if _, err := os.Stat(tablesPath); os.IsNotExist(err) {
 		if err2 := os.MkdirAll(tablesPath, 0755); err2 != nil {
 			logger.Fatal("Failed to create the \"" + tablesPath + "\" directory: " + err2.Error())

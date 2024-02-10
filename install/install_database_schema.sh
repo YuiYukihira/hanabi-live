@@ -4,7 +4,9 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 # Import the database information.
-source "$DIR/../.env"
+if [[ -e ".env" ]]; then
+   source ".env"
+fi
 
 if [[ -z ${DB_HOST-} ]]; then
   DB_HOST=localhost

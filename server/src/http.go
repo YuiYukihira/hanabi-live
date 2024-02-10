@@ -21,7 +21,7 @@ type TemplateData struct {
 	WebsiteName string
 	Title       string // Used to populate the "<title>" tag
 	Domain      string // Used to validate that the user is going to the correct URL
-	Version     int
+	Version     string
 	IsDev       bool
 
 	// Profile
@@ -242,13 +242,13 @@ func httpInit() {
 	httpRouter.GET("/export/:databaseID", httpExport)
 
 	// Other
-	httpRouter.Static("/public", path.Join(projectPath, "public"))
-	httpRouter.StaticFile("/favicon.ico", path.Join(projectPath, "public", "img", "favicon.ico"))
+	httpRouter.Static("/public", path.Join(clientPath, "public"))
+	httpRouter.StaticFile("/favicon.ico", path.Join(clientPath, "public", "img", "favicon.ico"))
 
 	if useTLS {
 		// Create the LetsEncrypt directory structure
 		// (CertBot will look for data in "/.well-known/acme-challenge/####")
-		letsEncryptPath := path.Join(projectPath, "letsencrypt")
+		letsEncryptPath := path.Join(clientPath, "letsencrypt")
 		if _, err := os.Stat(letsEncryptPath); os.IsNotExist(err) {
 			if err := os.MkdirAll(letsEncryptPath, 0755); err != nil {
 				logger.Fatal("Failed to create the \"" + letsEncryptPath + "\" directory: " +
@@ -358,7 +358,7 @@ func httpServeTemplate(w http.ResponseWriter, data *TemplateData, templateName .
 	// or else the page will be downloaded by the browser as "download.gz"
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
-	viewsPath := path.Join(projectPath, "server", "src", "views")
+	viewsPath := os.Getenv("VIEWSPATH")
 	layoutPath := path.Join(viewsPath, "layout.tmpl")
 	logoPath := path.Join(viewsPath, "logo.tmpl")
 
@@ -366,6 +366,8 @@ func httpServeTemplate(w http.ResponseWriter, data *TemplateData, templateName .
 	for i := 0; i < len(templateName); i++ {
 		templateName[i] = path.Join(viewsPath, templateName[i]+".tmpl")
 	}
+
+	logger.Info("layoutPath: " + layoutPath)
 
 	// Ensure that the layout file exists
 	if _, err := os.Stat(layoutPath); os.IsNotExist(err) {
