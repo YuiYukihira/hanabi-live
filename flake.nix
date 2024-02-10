@@ -27,6 +27,8 @@
       packages = std.harvest inputs.self [[ "hanabi-live" "packages" ]];
       apps = std.harvest inputs.self [[ "hanabi-live" "apps" ]];
       devShells = std.harvest inputs.self [[ "_automation" "devshells" ]];
+      devshellProfiles =
+        std.harvest inputs.self [[ "_automation" "devshellProfiles" ]];
     };
 
   nixConfig = {
