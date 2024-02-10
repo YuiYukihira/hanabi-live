@@ -71,12 +71,15 @@ in rec {
       (inputs.self + /tsconfig.json)
       (inputs.self + /packages)
       (inputs.self + /public)
-      (inputs.self + /node_modules)
     ];
 
     nativeBuildInputs = with nixpkgs; [ esbuild nodePackages.grunt-cli ];
 
-    npmDepsHash = "sha256-xqr2JuOlgXRsNMI5KiXRYnvxx1NNztpnFoQLSIbHIyY=";
+    npmDepsHash = l.fakeHash;
+    npmDeps = nixpkgs.fetchNpmDeps {
+      inherit src;
+      hash = "sha256-c7eNHhLVWa33/BWYx6QcqhzSm1NyPqT7DAAWvK1pMTE=";
+    };
 
     buildPhase = ''
       mkdir -p public/js/bundles public/css

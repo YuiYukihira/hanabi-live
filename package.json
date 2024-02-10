@@ -44,7 +44,7 @@
     "bufferutil": "^4.0.8",
     "dotenv": "^16.4.1",
     "drizzle-orm": "^0.29.3",
-    "esbuild": "^0.20.0",
+    "esbuild": "^0.19.0",
     "esbuild-plugin-pino": "^2.1.0",
     "eta": "^3.2.0",
     "fast-deep-equal": "^3.1.3",
