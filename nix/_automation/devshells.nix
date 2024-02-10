@@ -12,7 +12,12 @@ in l.mapAttrs (_: std.lib.dev.mkShell) {
       cell.devshellProfiles.hanabi-live
     ];
 
-    #services.hanabi-live = { enable = true; };
+    services.hanabi-live = {
+      enable = true;
+      package = nixpkgs.writeShellScriptBin "hanabi-live" ''
+        nix run
+      '';
+    };
     services.postgres.enable = true;
   };
 }

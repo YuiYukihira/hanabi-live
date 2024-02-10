@@ -58,9 +58,10 @@ func main() {
 		return
 	}
 
-	if os.Getenv("DATADIR") == "" {
+	dataPath = os.Getenv("DATADIR")
+	if dataPath == "" {
 		dataPath = projectPath
-	}
+	} else
 
 	// Initialize dev environment
 	if os.Getenv("DOMAIN") == "" ||
