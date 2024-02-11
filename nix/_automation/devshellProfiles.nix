@@ -4,16 +4,17 @@
     let
       cfg = config.services.hanabi-live;
       start-command = pkgs.writeShellScriptBin "start-hanabi" ''
-        DB_USER=${cfg.db.userName} \
-        DB_PASSWORD=${cfg.db.userPassword} \
-        DB_HOST=${
+        export DB_USER=${cfg.db.userName}
+        export DB_PASSWORD=${cfg.db.userPassword}
+        export DB_HOST=${
           if cfg.db.host == "nix-service" then "localhost" else cfg.db.host
-        } \
-        DB_PORT=${cfg.db.port} \
-        DB_NAME=${cfg.db.name} \
-        DOMAIN=${cfg.domain} \
-        SESSION_SECRET="${cfg.sessionSecret}" \
-        PORT="${cfg.port}" \
+        }
+        export DB_PORT=${cfg.db.port}
+        export DB_NAME=${cfg.db.name}
+        export DOMAIN=${cfg.domain}
+        export SESSION_SECRET="${cfg.sessionSecret}"
+        export PORT="${cfg.port}"
+        export DATADIR="$PRJ_DATA_DIR"
         ${cfg.package}/bin/hanabi-live
       '';
     in {

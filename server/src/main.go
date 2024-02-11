@@ -23,6 +23,7 @@ var (
 	versionPath string
 	tablesPath  string
 	dataPath    string
+	miscPath    string
 	clientPath  string
 
 	gitCommitOnStart string
@@ -58,10 +59,17 @@ func main() {
 		return
 	}
 
+	miscPath = os.Getenv("MISCDIR")
+	if miscPath == "" {
+		miscPath = projectPath
+	}
+
 	dataPath = os.Getenv("DATADIR")
 	if dataPath == "" {
-		dataPath = projectPath
-	} else
+		dataPath = "."
+	}
+
+
 
 	// Initialize dev environment
 	if os.Getenv("DOMAIN") == "" ||
@@ -127,7 +135,7 @@ func main() {
 	}
 
 	// Check to see if the "ongoing_tables" directory exists
-	tablesPath = path.Join(".", "ongoing_tables")
+	tablesPath = path.Join(dataPath, "ongoing_tables")
 	if _, err := os.Stat(tablesPath); os.IsNotExist(err) {
 		if err2 := os.MkdirAll(tablesPath, 0755); err2 != nil {
 			logger.Fatal("Failed to create the \"" + tablesPath + "\" directory: " + err2.Error())

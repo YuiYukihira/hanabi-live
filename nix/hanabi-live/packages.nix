@@ -11,7 +11,7 @@ in rec {
   hanabi-live = nixpkgs.writeShellScriptBin "hanabi-live" ''
     export VERSION=${cell.packages.server.version}
     export CLIENT_DIST=${cell.packages.client}
-    export DATADIR=${cell.packages.misc}
+    export MISCDIR=${cell.packages.misc}
     export VIEWSPATH="${cell.packages.views}/share/views"
     ${install_schema}/bin/install_schema
     ${server}/bin/hanabi-live
@@ -48,7 +48,7 @@ in rec {
     sourceRoot = "${src.name}/server/src";
   };
 
-  misc = std.incl (inputs.self) [ (inputs.self + /misc) ];
+  misc = std.incl (inputs.self + /misc) [ (inputs.self + /misc) ];
 
   views = nixpkgs.stdenv.mkDerivation {
     name = "views";
